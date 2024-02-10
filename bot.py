@@ -31,26 +31,25 @@ time.sleep(2)
 
 # Extrai dados da tabela
 table_data = []
-while(next > 0):
+while next > 0:
     rows = driver.find_elements(By.XPATH, f"//table[@id='{table_id}']/tbody/tr")
 
     for row in rows:
         
         # Espera até que o texto da célula esteja presente
-        cell_text = WebDriverWait(row, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "td"))).text
+        WebDriverWait(row, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "td"))).text
     
         # Adiciona dados à tabela apenas se o texto da célula não estiver vazio
-        if cell_text:
-            cells = row.find_elements(By.TAG_NAME, "td")
-            check_date = datetime.strptime(cells[2].text, "%d-%m-%Y")
+        cells = row.find_elements(By.TAG_NAME, "td")
+        check_date = datetime.strptime(cells[2].text, "%d-%m-%Y")
       
-            # Adiciona somente as que estão vencidas ou vencendo hoje
-            if check_date.date() <= date.today():
-                table_data.append([
-                    cells[1].text,
-                    cells[2].text,
-                    cells[3].find_element(By.TAG_NAME, "a").get_attribute("href")
-                ])
+        # Adiciona somente as que estão vencidas ou vencendo hoje
+        if check_date.date() <= date.today():
+            table_data.append([
+                cells[1].text,
+                cells[2].text,
+                cells[3].find_element(By.TAG_NAME, "a").get_attribute("href")
+            ])
 
     # Resolve o problema de ter que "rolar" a página até "next" estar no campo de visão
     # driver.execute_script("arguments[0].scrollIntoView();", next_element)
@@ -74,8 +73,8 @@ with open(extracted_data_file, 'w', newline='') as file_csv:
 print(f'Arquivo "{extracted_data_file}" criado com sucesso.')
 
 # Submete o invoices.csv
-file_input = driver.find_element(By.NAME, "csv")
-file_input.send_keys(os.path.abspath(extracted_data_file))
+#file_input = driver.find_element(By.NAME, "csv")
+#file_input.send_keys(os.path.abspath(extracted_data_file))
 
 
 # time.sleep(120)
