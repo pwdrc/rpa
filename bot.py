@@ -73,9 +73,11 @@ with open(extracted_data_file, 'w', newline='') as file_csv:
 print(f'Arquivo "{extracted_data_file}" criado com sucesso.')
 
 # Submete o invoices.csv
-#file_input = driver.find_element(By.NAME, "csv")
-#file_input.send_keys(os.path.abspath(extracted_data_file))
+file_input = driver.find_element(By.NAME, "csv")
+file_input.send_keys(os.path.abspath(extracted_data_file))
 
+print(f'{extracted_data_file} submetido com sucesso')
+print("se deu certo é outra história ¯\_(ツ)_/¯")
 
 # time.sleep(120)
 driver.quit()
