@@ -1,5 +1,6 @@
 import os
 import time
+from datetime import datetime,date
 import csv
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -36,11 +37,17 @@ while(next > 0):
         # Adiciona dados à tabela apenas se o texto da célula não estiver vazio
         if cell_text:
             cells = row.find_elements(By.TAG_NAME, "td")
-            table_data.append([
-                cells[1].text,
-                cells[2].text,
-                cells[3].find_element(By.TAG_NAME, "a").get_attribute("href")
-            ])
+        
+            check_date = datetime.strptime(cells[2].text, "%d-%m-%Y")
+            
+            # print datetime.today()
+
+            if check_date.date() <= date.today():
+                table_data.append([
+                    cells[1].text,
+                    cells[2].text,
+                    cells[3].find_element(By.TAG_NAME, "a").get_attribute("href")
+                ])
     next_element = driver.find_element(By.CLASS_NAME, "next")
     next_element.click()
     next = next - 1
