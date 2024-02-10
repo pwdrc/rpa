@@ -39,8 +39,10 @@ while next > 0:
         # Espera até que o texto da célula esteja presente
         WebDriverWait(row, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "td"))).text
     
-        # Adiciona dados à tabela apenas se o texto da célula não estiver vazio
+        # Encontra os elementos "células" da tabela
         cells = row.find_elements(By.TAG_NAME, "td")
+
+        # Inicializa a variável de data para encontrar as notas vencidas
         check_date = datetime.strptime(cells[2].text, "%d-%m-%Y")
       
         # Adiciona somente as que estão vencidas ou vencendo hoje
@@ -59,7 +61,7 @@ while next > 0:
     next_element.click()
     next = next - 1
 
-# Imprime os dados da tabela
+# Imprime os dados da tabela (teste)
 print(table_data)
 
 # Escreve os dados no arquivo invoices.csv
