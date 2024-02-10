@@ -9,46 +9,54 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # Configurações gerais
-driver = webdriver.Chrome()
+options = webdriver.ChromeOptions()
+options.add_argument('--headless')
+driver = webdriver.Chrome(options=options)
 base_url = "https://rpachallengeocr.azurewebsites.net/"
 start_button_id = "start" 
 table_id = "tableSandbox"
 extracted_data_file = "invoices.csv"
+next = 3
 
 # Inicia a navegação
 driver.get(base_url)
+
+# Clica no botão de start
 start_button = driver.find_element(By.ID, start_button_id)
 start_button.click()
 
 # Aguarda o carregamento da tabela
-time.sleep(3)
+time.sleep(2)
+# WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, table_id)))
 
 # Extrai dados da tabela
 table_data = []
-next = 3
 while(next > 0):
-    #time.sleep(1)
     rows = driver.find_elements(By.XPATH, f"//table[@id='{table_id}']/tbody/tr")
 
     for row in rows:
+        
         # Espera até que o texto da célula esteja presente
         cell_text = WebDriverWait(row, 10).until(EC.visibility_of_element_located((By.TAG_NAME, "td"))).text
     
         # Adiciona dados à tabela apenas se o texto da célula não estiver vazio
         if cell_text:
             cells = row.find_elements(By.TAG_NAME, "td")
-        
             check_date = datetime.strptime(cells[2].text, "%d-%m-%Y")
-            
-            # print datetime.today()
-
+      
+            # Adiciona somente as que estão vencidas ou vencendo hoje
             if check_date.date() <= date.today():
                 table_data.append([
                     cells[1].text,
                     cells[2].text,
                     cells[3].find_element(By.TAG_NAME, "a").get_attribute("href")
                 ])
-    next_element = driver.find_element(By.CLASS_NAME, "next")
+
+    # Resolve o problema de ter que "rolar" a página até "next" estar no campo de visão
+    # driver.execute_script("arguments[0].scrollIntoView();", next_element)
+    driver.execute_script("window.scrollTo(0, 0);")
+    driver.execute_script("window.scrollTo(document.body.scrollWidth, 0);")
+    next_element = WebDriverWait(driver, 10).until(EC.element_to_be_clickable((By.ID, "tableSandbox_next")))
     next_element.click()
     next = next - 1
 
@@ -69,6 +77,6 @@ print(f'Arquivo "{extracted_data_file}" criado com sucesso.')
 file_input = driver.find_element(By.NAME, "csv")
 file_input.send_keys(os.path.abspath(extracted_data_file))
 
-# Aguarda X segundos antes de fechar
-time.sleep(10)
+
+# time.sleep(120)
 driver.quit()
